@@ -1,37 +1,64 @@
-let expression = ""; // This will hold the current expression entered by the user
+let expression = "";
 
-// Function to append a value to the display
 function appendValue(value) {
+    const lastChar = expression.trim().slice(-1);
+    if (isOperator(lastChar) && isOperator(value)) {
+        return;
+    }
     expression += value;
-    document.getElementById("result").value = expression;
+    updateDisplay();
 }
-
-// Function to handle mathematical operations
 function operate(operator) {
+   
+    if (expression === "" || isOperator(expression.trim().slice(-1))) {
+        return; 
+    }
     expression += " " + operator + " ";
-    document.getElementById("result").value = expression;
+    updateDisplay();
 }
-
-// Function to clear the display
 function clearDisplay() {
     expression = "";
-    document.getElementById("result").value = expression;
+    updateDisplay();
 }
-
-// Function to handle backspace (delete the last character)
 function backspace() {
+   
+    expression = expression.trim();
     expression = expression.slice(0, -1);
-    document.getElementById("result").value = expression;
+    
+   
+    if (expression.trim().slice(-1) === " ") {
+        expression = expression.slice(0, -1);
+    }
+    updateDisplay();
 }
-
-// Function to calculate the result of the expression
 function calculate() {
     try {
-        // Use eval to calculate the expression (be cautious with eval in real apps)
+        
+        if (expression.trim() === "" || isOperator(expression.trim().slice(-1))) {
+            throw new Error("Invalid Expression");
+        }
+
+        
         expression = eval(expression).toString();
-        document.getElementById("result").value = expression;
+        updateDisplay();
     } catch (error) {
-        document.getElementById("result").value = "Error"; // Display error if the calculation fails
-        expression = ""; // Reset the expression on error
+        
+        document.getElementById("result").value = `Error: ${error.message}`;
+        expression = "";
+    }
+}
+
+
+function isOperator(char) {
+    return ["+", "-", "*", "/"].includes(char);
+}
+
+function updateDisplay() {
+    const resultElement = document.getElementById("result");
+    if (expression.length > 20) {
+        resultElement.value = "Overflow Error";
+        expression = "";
+    } else {
+        resultElement.value = expression;
     }
 }
